@@ -30,7 +30,7 @@ public class TransactionCompensateDao {
     }
 
     public boolean stillHaveUnFinshedCompensationInTransaction(long txid) {
-        return 0 < jdbi.withExtension(TransactionCompensateSql.class,dao -> dao.selectCountCompensate(txid, TransactionState.start.getState()));
+        return 0 < jdbi.withExtension(TransactionCompensateSql.class,dao -> dao.selectCountCompensate(txid, false));
     }
 
     public TransactionCompensate queryCompensate(String id) {

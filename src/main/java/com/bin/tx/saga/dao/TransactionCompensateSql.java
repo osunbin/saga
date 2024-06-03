@@ -20,7 +20,7 @@ public interface TransactionCompensateSql {
     List<TransactionCompensate> selectCompensateListByTxid(@Bind("txid") long txid);
 
     @SqlQuery("SELECT count(id) from t_txcompensate where txid = :txid  and success = :success order by create_time")
-    int selectCountCompensate(@Bind("txid") long txid,@Bind("success") int success);
+    int selectCountCompensate(@Bind("txid") long txid,@Bind("success") boolean success);
 
 
     @SqlQuery("SELECT  id, txid,  success, create_time, update_time, step FROM t_txcompensate WHERE id =:id ")

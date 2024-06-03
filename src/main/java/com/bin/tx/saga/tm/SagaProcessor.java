@@ -32,6 +32,10 @@ public class SagaProcessor {
 
 
     public void execCompensate(SagaTransaction globalTx) throws Exception {
+
+        SagaTransaction sagaTransaction = sagaTransactionDao.query(globalTx.getTxid());
+        if (sagaTransaction.finish()) return;
+
         List<TransactionCompensate> transactionCompensates =
                 transactionCompensateDao.queryCompensateListByTxid(globalTx.getTxid());
         PriorityQueue<TransactionCompensate> queue =
@@ -42,7 +46,7 @@ public class SagaProcessor {
                 break;
             }
         }
-        compensateHook(globalTx);
+        compensateFinish(globalTx);
     }
 
     private boolean compensateRecord(TransactionCompensate transactionCompensate) {
@@ -60,9 +64,10 @@ public class SagaProcessor {
         return compensateSuccess;
     }
 
-    private void compensateHook(SagaTransaction globalTx) {
+    private void compensateFinish(SagaTransaction globalTx) {
         long txid = globalTx.getTxid();
         logger.info(" processor compensate hook txid :{}", txid);
+
         boolean finishAllCompensate =
                 !transactionCompensateDao.stillHaveUnFinshedCompensationInTransaction(txid);
         if (finishAllCompensate) {

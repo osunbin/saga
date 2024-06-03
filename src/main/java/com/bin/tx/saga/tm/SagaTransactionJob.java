@@ -51,6 +51,7 @@ public class SagaTransactionJob {
      *  补偿
      */
     public void execCompensate() {
+
         try {
             List<SagaTransaction> list = sagaTransactionDao.queryTransactionList();
             logger.info("fetch transaction size :{} ", list.size());
@@ -59,7 +60,7 @@ public class SagaTransactionJob {
                 logger.info("processor compensate  txid :{}", txid);
                 try (RedisLock redisLock =
                              new RedisLock("lock:sagas:" + txid)) {
-                    if (redisLock.acquire(20)) {
+                    if (redisLock.acquire(30)) {
                         processor.execCompensate(transaction);
                     }
                 }

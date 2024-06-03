@@ -63,6 +63,11 @@ public class SagaTransaction implements Comparable<SagaTransaction> {
         this.state = TransactionState.compensateFinish.getState();
     }
 
+    public boolean finish() {
+        if (state == TransactionState.compensateFinish.getState()) return true;
+        return false;
+    }
+
     public long getTxid() {
         return txid;
     }
