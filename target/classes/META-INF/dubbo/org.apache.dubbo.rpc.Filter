@@ -1,0 +1,2 @@
+sagaProviderFilter=com.bin.tx.saga.filter.dubbo.SagaProviderFilter
+sagaConsumerFilter=com.bin.tx.saga.filter.dubbo.SagaConsumerFilter
