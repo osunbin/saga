@@ -26,7 +26,7 @@ public class SagaTest {
         };
         SagaManager.registerSagaListener(sagaListener);
 
-        SagaManager.startTransaction();
+        SagaManager.startSaga();
 
 
 
@@ -37,7 +37,7 @@ public class SagaTest {
 
 
 
-        SagaManager.endTransaction();
+        SagaManager.sagaSuccess();
 
     }
 }

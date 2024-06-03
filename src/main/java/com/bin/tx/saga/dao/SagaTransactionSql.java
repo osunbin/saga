@@ -25,7 +25,7 @@ public interface SagaTransactionSql {
     List<SagaTransaction> selectTransaction(@Bind("state") int state);
 
 
-    @SqlQuery("SELECT  txid,state,priority,attachment,create_time createTime,update_time updateTime FROM t_saga_tx WHERE state = :state and create_time < :date order by rand() limit 500 ")
+    @SqlQuery("SELECT  txid,state,priority,attachment,create_time createTime,update_time updateTime FROM t_saga_tx WHERE state = :state and create_time < :date  order by create_time ASC limit 500 ")
     List<SagaTransaction> selectUnFishedTransaction(@Bind("state") int state, @Bind("date") Date date);
 
 }

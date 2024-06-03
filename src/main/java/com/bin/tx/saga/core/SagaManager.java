@@ -14,26 +14,25 @@ public class SagaManager {
     private static SagaListener sagaListener;
 
 
-
     public static void registerSagaListener(SagaListener listener) {
         sagaListener = listener;
     }
 
-    public static long  startAsyncTransaction() {
+
+    public static long startAsyncSaga() {
         long txid = TransactionId.getAsyncTransactionId();
         startTransaction(txid);
         return txid;
     }
 
 
-
-    public static void  startTransaction() {
+    public static void startSaga() {
         long txid = TransactionId.createTransactionId();
         startTransaction(txid);
     }
 
-    private static void  startTransaction(long txid) {
-        logger.info("start saga transaction txid:{}",txid);
+    private static void startTransaction(long txid) {
+        logger.info("start saga transaction txid:{}", txid);
 
         SagaTransaction globalTx = SagaTransaction.start(txid);
 
@@ -41,26 +40,42 @@ public class SagaManager {
 
     }
 
-    public static void endAsyncTransaction(long txid) {
-        endTransaction(txid);
+
+    public static void sagaSuccess(long txid) {
+        endTransaction(txid, true);
+    }
+
+    public static void sagaFail(long txid) {
+        endTransaction(txid, false);
+    }
+
+    public static void sagaSuccess() {
+        endTransaction(true);
+    }
+
+    public static void sagaFail() {
+        endTransaction(false);
     }
 
 
-    public static void endTransaction(){
+    private static void endTransaction(boolean success) {
         long txid = TransactionId.getTransactionId();
-        endTransaction(txid);
+        endTransaction(txid, success);
         TransactionId.cleartxid();
     }
 
-    private static void endTransaction(long txid) {
+    private static void endTransaction(long txid, boolean success) {
         SagaTransaction globalTx = sagaTransactionDao.query(txid);
-        if (globalTx.isStart()) {
-            globalTx.end();
-            sagaTransactionDao.updateTxState(globalTx);
-            logger.info("end saga transaction txid:{}",txid);
-            if (sagaListener != null) {
-                sagaListener.pushSuccess(globalTx);
-            }
+        if (!globalTx.isStart()) return;
+
+        globalTx.execSuccess(success);
+        sagaTransactionDao.updateTxState(globalTx);
+        logger.info("end saga transaction  txid:{} success:{}", txid, success);
+
+        if (success && sagaListener != null) {
+            sagaListener.pushSuccess(globalTx);
         }
+
     }
+
 }

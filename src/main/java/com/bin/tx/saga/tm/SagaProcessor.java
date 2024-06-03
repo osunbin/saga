@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.PriorityQueue;
 
 import static com.bin.tx.saga.dao.SagaTransactionDao.sagaTransactionDao;
 import static com.bin.tx.saga.dao.TransactionCompensateDao.transactionCompensateDao;
@@ -29,29 +29,23 @@ public class SagaProcessor {
         this.compensateListener = compensateListener;
     }
 
-    public void compensate(SagaTransaction globalTx) {
-        logger.info(" processor trigger txid=" + globalTx.getTxid());
-        globalTx.compensate();
-        globalTx.updateTime();
-        sagaTransactionDao.updateCompensate(globalTx);
-    }
 
 
     public void execCompensate(SagaTransaction globalTx) throws Exception {
         List<TransactionCompensate> transactionCompensates =
                 transactionCompensateDao.queryCompensateListByTxid(globalTx.getTxid());
-        PriorityBlockingQueue<TransactionCompensate> queue =
-                new PriorityBlockingQueue<>(transactionCompensates);
+        PriorityQueue<TransactionCompensate> queue =
+                new PriorityQueue<>(transactionCompensates);
 
         while (queue.peek() != null) {
-            if (!compensateRecord(queue.take())) {
+            if (!compensateRecord(queue.poll())) {
                 break;
             }
         }
         compensateHook(globalTx);
     }
 
-    public boolean compensateRecord(TransactionCompensate transactionCompensate) {
+    private boolean compensateRecord(TransactionCompensate transactionCompensate) {
         long txid = transactionCompensate.getTxid();
         String id = transactionCompensate.getId();
         logger.info(" processor compensate record txid:{}  actionid: {}",txid, id);

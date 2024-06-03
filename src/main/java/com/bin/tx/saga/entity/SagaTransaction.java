@@ -47,8 +47,16 @@ public class SagaTransaction implements Comparable<SagaTransaction> {
         return false;
     }
 
+    public void execSuccess(boolean success) {
+        if (success)
+            end();
+        else
+          compensate();
+    }
+
     public void compensate() {
         this.state = TransactionState.compensate.getState();
+        updateTime();
     }
 
     public void compensateFinish() {
