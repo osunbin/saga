@@ -74,8 +74,8 @@ public class SagaTransactionJob {
     public void timeoutCompensate() {
         List<SagaTransaction> list = null;
         try {
-            // 1 小时
-            list = sagaTransactionDao.queryUnFishedTransaction(600);
+            // 30 分钟
+            list = sagaTransactionDao.queryUnFishedTransaction(300);
         } catch (Exception e) {
             logger.error("queryUnFishedTransaction err ", e);
         }
@@ -90,7 +90,6 @@ public class SagaTransactionJob {
                 logger.error(" trigger compensate err", e);
             }
         }
-
     }
 
 }
